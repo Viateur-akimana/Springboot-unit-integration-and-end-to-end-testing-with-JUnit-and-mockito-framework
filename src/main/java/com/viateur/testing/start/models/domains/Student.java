@@ -33,4 +33,5 @@ public class Student {
     @Min(value = 16, message = "Age must be at least 16")
     @Column(name = "age")
     private Integer age;
+
 }
