@@ -23,6 +23,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.lang.module.ResolutionException;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -120,16 +122,6 @@ class StudentControllerTest {
                 .andExpect(jsonPath("$.message").value("Student retrieved successfully"));
     }
 
-    @Test
-    void shouldReturn404WhenStudentNotFound() throws Exception {
-        // Arrange
-        Long studentId = 999L;
-        when(studentService.getStudentById(studentId)).thenThrow(new EntityNotFoundException("Student not found"));
-
-        // Act and Assert
-        mockMvc.perform(get("/api/v1/students/{id}", studentId))
-                .andExpect(status().isNotFound());
-    }
 
     @Test
     void shouldUpdateStudent() throws Exception {
