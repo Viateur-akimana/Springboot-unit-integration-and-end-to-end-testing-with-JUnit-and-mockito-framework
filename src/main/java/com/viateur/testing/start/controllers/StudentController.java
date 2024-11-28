@@ -4,19 +4,18 @@ import com.viateur.testing.start.models.domains.ApiResponse;
 import com.viateur.testing.start.models.domains.Student;
 import com.viateur.testing.start.models.dtos.StudentDTO;
 import com.viateur.testing.start.services.IStudentService;
+import com.viateur.testing.start.services.MessageService;
 import com.viateur.testing.start.utils.ApiResponseUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Locale;
-
 @RestController
 @RequestMapping("/api/v1/students")
 @RequiredArgsConstructor
@@ -24,7 +23,8 @@ import java.util.Locale;
 public class StudentController {
 
     private final IStudentService studentService;
-    private final MessageSource messageSource;  // Injecting MessageSource for internationalization
+    @Autowired
+    private MessageService messageService;
 
     /**
      * Endpoint to create a new student. Returns the created student in the response.
@@ -36,7 +36,7 @@ public class StudentController {
         Student student = studentService.createStudent(request);
 
         // Fetching localized message using MessageSource
-        String message = messageSource.getMessage("student.created", null, new Locale(language));
+        String message = messageService.getMessage("student.created");
 
         ApiResponse<Student> response = new ApiResponse<>(student, message, HttpStatus.CREATED);
         log.info("Student with ID {} created successfully", student.getId());
@@ -53,7 +53,7 @@ public class StudentController {
         List<Student> students = studentService.getAllStudents();
 
         // Fetching localized message using MessageSource
-        String message = messageSource.getMessage("students.retrieved", null, new Locale(language));
+        String message = messageService.getMessage("students.retrieved");
 
         ApiResponse<List<Student>> response = new ApiResponse<>(students, message, HttpStatus.OK);
         log.info("Fetched all students from the database.");
@@ -68,11 +68,10 @@ public class StudentController {
     public ResponseEntity<ApiResponse<Student>> getStudentById(@PathVariable Long id,
                                                                @RequestHeader(value = "Accept-Language", defaultValue = "en") String language) {
         // Get student by ID
-        Student student = studentService.getStudentById(id)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("student.not.found", null, new Locale(language))));
+        Student student = studentService.getStudentById(id).orElseThrow(() -> new EntityNotFoundException(messageService.getMessage("student.not.found")));
 
         // Fetching localized message using MessageSource
-        String message = messageSource.getMessage("student.retrieved", null, new Locale(language));
+        String message = messageService.getMessage("student.retrieved");
 
         ApiResponse<Student> response = new ApiResponse<>(student, message, HttpStatus.OK);
         log.info("Fetched student with ID: {}", id);
@@ -90,7 +89,7 @@ public class StudentController {
         Student student = studentService.updateStudent(id, request);
 
         // Fetching localized message using MessageSource
-        String message = messageSource.getMessage("student.updated", null, new Locale(language));
+        String message = messageService.getMessage("student.updated");
 
         ApiResponse<Student> response = new ApiResponse<>(student, message, HttpStatus.OK);
         log.info("Updated student with ID: {}", id);
@@ -107,7 +106,7 @@ public class StudentController {
         studentService.deleteStudent(id);
 
         // Fetching localized message using MessageSource
-        String message = messageSource.getMessage("student.deleted", null, new Locale(language));
+        String message = messageService.getMessage("student.deleted");
 
         ApiResponse<Void> response = new ApiResponse<>(null, message, HttpStatus.NO_CONTENT);
         log.info("Deleted student with ID: {}", id);
