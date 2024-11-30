@@ -1,11 +1,12 @@
 package com.viateur.testing.start.services.impl;
 
+import com.viateur.testing.start.exceptions.StudentNotFoundException;
 import com.viateur.testing.start.models.domains.Student;
 import com.viateur.testing.start.models.dtos.StudentDTO;
 import com.viateur.testing.start.repositories.IStudentRepository;
 import com.viateur.testing.start.services.IStudentService;
+import com.viateur.testing.start.services.MessageService;
 import com.viateur.testing.start.utils.StudentMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class StudentServiceImpl implements IStudentService {
+
+    @Autowired
+    private MessageService messageService;
 
     @Autowired
     private IStudentRepository studentRepository;
@@ -58,7 +62,7 @@ public class StudentServiceImpl implements IStudentService {
     public Student updateStudent(Long id, StudentDTO studentDTO) {
         // Find student by ID
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+                .orElseThrow(() -> new StudentNotFoundException(messageService.getMessage("student.not.found")));
         // Update student with data from DTO
         StudentMapper.updateEntity(student, studentDTO);
         log.info("Updating student with ID: {}", id);

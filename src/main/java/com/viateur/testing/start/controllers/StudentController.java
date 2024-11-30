@@ -60,27 +60,20 @@ public class StudentController {
         return ApiResponseUtil.toResponseEntity(response);
     }
 
-    /**
-     * Endpoint to fetch a student by its ID.
-     * Throws an exception if student is not found.
-     */
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Student>> getStudentById(@PathVariable Long id,
                                                                @RequestHeader(value = "Accept-Language", defaultValue = "en") String language) {
-        // Get student by ID
+
         Student student = studentService.getStudentById(id).orElseThrow(() -> new EntityNotFoundException(messageService.getMessage("student.not.found")));
 
-        // Fetching localized message using MessageSource
+
         String message = messageService.getMessage("student.retrieved");
 
         ApiResponse<Student> response = new ApiResponse<>(student, message, HttpStatus.OK);
         log.info("Fetched student with ID: {}", id);
         return ApiResponseUtil.toResponseEntity(response);
     }
-
-    /**
-     * Endpoint to update a student's information.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Student>> updateStudent(@PathVariable Long id,
                                                               @Valid @RequestBody StudentDTO request,
